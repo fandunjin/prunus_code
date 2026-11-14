@@ -1,0 +1,2 @@
+target	fasta	edta_gff	lineage_table
+PZI-A1	data/assemblies/pziA1.fa	data/repeats/pziA1.gff3	data/lineages/PZI-A1_rex.tsv

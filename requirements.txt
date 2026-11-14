@@ -1,0 +1,8 @@
+# Python 3.10 or newer; external analysis tools are listed in docs/commands.md.
+biopython
+numpy
+pandas
+scipy
+matplotlib
+jcvi
+ete4

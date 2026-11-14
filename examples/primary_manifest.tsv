@@ -1,0 +1,2 @@
+track	frozen_pep	id_map	restored_pep	cds
+pzi_A	data/proteins/pzi_A.fa	data/id_maps/pzi_A.tsv		data/cds/pzi_A.fa

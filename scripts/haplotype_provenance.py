@@ -28,7 +28,7 @@ def read_fasta(path):
 
 def wrap(seq, width=80):
     for i in range(0, len(seq), width):
-        yield seq[i:i + width]
+        yield seq[i : i + width]
 
 
 def read_lengths(fasta):
@@ -108,7 +108,9 @@ def load_pairs(path):
 def infer_assignments(rows, chr_lengths, pairs, dominance_threshold):
     intervals = defaultdict(lambda: {"hap1": [], "hap2": []})
     raw_bp = defaultdict(lambda: {"hap1": 0, "hap2": 0})
-    best_targets = defaultdict(lambda: {"hap1": defaultdict(int), "hap2": defaultdict(int)})
+    best_targets = defaultdict(
+        lambda: {"hap1": defaultdict(int), "hap2": defaultdict(int)}
+    )
 
     for row in rows:
         chrom = row["target"]
@@ -133,7 +135,11 @@ def infer_assignments(rows, chr_lengths, pairs, dominance_threshold):
         else:
             dominant = "hap2"
             dominance = hap2_bp / total
-        status = "confident" if dominant != "unknown" and dominance >= dominance_threshold else "ambiguous"
+        status = (
+            "confident"
+            if dominant != "unknown" and dominance >= dominance_threshold
+            else "ambiguous"
+        )
         summary[chrom] = {
             "chr": chrom,
             "length": chr_lengths[chrom],
@@ -240,7 +246,9 @@ def write_copy_fastas(records, corrected_pairs, copy1_out, copy2_out):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Assign final chromosomes to hifiasm hap1/hap2 provenance.")
+    parser = argparse.ArgumentParser(
+        description="Assign final chromosomes to hifiasm hap1/hap2 provenance."
+    )
     parser.add_argument("--final-fasta", required=True)
     parser.add_argument("--hap1-paf", required=True)
     parser.add_argument("--hap2-paf", required=True)
@@ -271,7 +279,9 @@ def main():
         args.dominance_threshold,
     )
     write_summary(str(out_prefix) + ".chr_hap_provenance.tsv", summary)
-    write_corrected_pairs(str(out_prefix) + ".corrected_homolog_pairs.tsv", corrected_pairs)
+    write_corrected_pairs(
+        str(out_prefix) + ".corrected_homolog_pairs.tsv", corrected_pairs
+    )
     write_copy_fastas(records, corrected_pairs, args.copy1_fasta, args.copy2_fasta)
 
     ambiguous = [row for row in summary.values() if row["status"] != "confident"]

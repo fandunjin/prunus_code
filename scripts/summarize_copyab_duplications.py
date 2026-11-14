@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
-from collections import Counter, defaultdict
+from collections import defaultdict
 from pathlib import Path
 
 
@@ -17,7 +17,11 @@ def main() -> None:
     args = ap.parse_args()
 
     dup = args.result / "Gene_Duplication_Events" / "Duplications.tsv"
-    counts = args.result / "Comparative_Genomics_Statistics" / "Duplications_per_Species_Tree_Node.tsv"
+    counts = (
+        args.result
+        / "Comparative_Genomics_Statistics"
+        / "Duplications_per_Species_Tree_Node.tsv"
+    )
     tree = args.result / "Species_Tree" / "SpeciesTree_rooted_node_labels.txt"
     for p in (dup, counts, tree):
         if not p.is_file():
@@ -55,29 +59,45 @@ def main() -> None:
         all_n = len(families)
         supported = sum(1 for r in families if r["_support"] >= args.support)
         nonterminal = sum(1 for r in families if r.get("Type") == "Non-Terminal")
-        out_rows.append({
-            "species_tree_node": node,
-            "duplication_events_all_rows": all_n,
-            "duplication_events_support_ge_cutoff": supported,
-            "nonterminal_events": nonterminal,
-            "support_cutoff": args.support,
-            "native_duplications_all": native.get(node, {}).get("Duplications (all)", ""),
-            "native_duplications_support_ge_50": native.get(node, {}).get("Duplications (50% support)", ""),
-        })
+        out_rows.append(
+            {
+                "species_tree_node": node,
+                "duplication_events_all_rows": all_n,
+                "duplication_events_support_ge_cutoff": supported,
+                "nonterminal_events": nonterminal,
+                "support_cutoff": args.support,
+                "native_duplications_all": native.get(node, {}).get(
+                    "Duplications (all)", ""
+                ),
+                "native_duplications_support_ge_50": native.get(node, {}).get(
+                    "Duplications (50% support)", ""
+                ),
+            }
+        )
     out = args.outdir / "copyAB_duplication_node_counts.tsv"
     with out.open("w", encoding="utf-8", newline="") as h:
-        writer = csv.DictWriter(h, fieldnames=list(out_rows[0]), delimiter="\t", lineterminator="\n") if out_rows else None
+        writer = (
+            csv.DictWriter(
+                h, fieldnames=list(out_rows[0]), delimiter="\t", lineterminator="\n"
+            )
+            if out_rows
+            else None
+        )
         if writer:
             writer.writeheader()
             writer.writerows(out_rows)
-    (args.outdir / "copyAB_species_tree_rooted_node_labels.txt").write_text(tree.read_text(encoding="utf-8"), encoding="utf-8")
+    (args.outdir / "copyAB_species_tree_rooted_node_labels.txt").write_text(
+        tree.read_text(encoding="utf-8"), encoding="utf-8"
+    )
     (args.outdir / "README.md").write_text(
         "# CopyAB duplication mapping\n\n"
         "Input is native OrthoFinder reconciliation for 14 terminals. PZI, PSP and PPA are each represented as an A1+B1 copyAB terminal.\n\n"
-        "The table reports duplication rows mapped to each species-tree node and the number meeting the requested gene-tree support cutoff. These are gene-family duplication counts, not direct WGD-event counts.\n",
+        "The table reports duplication rows mapped to each species-tree node and the number meeting the requested species-overlap support cutoff (not gene-tree bootstrap support). These are duplication-event counts, not direct WGD-event counts.\n",
         encoding="ascii",
     )
-    print(f"[OK] Summarized {len(rows)} duplication rows across {len(out_rows)} nodes: {out}")
+    print(
+        f"[OK] Summarized {len(rows)} duplication rows across {len(out_rows)} nodes: {out}"
+    )
 
 
 if __name__ == "__main__":

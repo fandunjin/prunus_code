@@ -1,7 +1,7 @@
-*.log
-*.err
-*.out
-logs/
 __pycache__/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+results/
+*.log
 .DS_Store
